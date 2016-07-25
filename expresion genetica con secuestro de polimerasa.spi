@@ -1,0 +1,41 @@
+directive sample 1000.0 1000
+directive plot Pol() ; Gen1() ; Mensg1() ; Mensg2() ; Gen1tr()
+
+
+new transcribir@100.0 :chan
+
+val degm = 0.1 (*degradacion del mRNA*)
+
+val salg1 = 0.58  (*tiempo de liberacion del promotor y tiempo que dura la transcripcion del mensajero para este gen*)
+val trg1 = 0.01 (*dependiendo de la longitud del mensajero, el tiempo estimado debe
+corresponder a una tasa de transcripcionde alrededor de 40 nucleótidos / seg*)
+
+
+val salg2 = 2.0
+val trg2 = 0.01
+
+
+let Pol () = !transcribir 
+
+let Gen1() = ?transcribir ; delay@salg1 ; ( Gen1tr() | Gen1() )
+and Gen1tr() = delay@trg1 ; (Pol() | Mensg1())
+and Mensg1() = delay@degm
+
+let Gen2() = ?transcribir ; delay@salg2 ; (Gen2tr() | Gen2() )
+and Gen2tr() = delay@trg2 ; (Pol() | Mensg2())
+and Mensg2() = delay@degm
+
+
+run ( 38 of Pol() | Gen1() )
+
+(* en este modelo se plantea el secuestro de la RNApolimerasa
+durante la transcripcion de un gen, primero asociada al promotor
+para iniciar la transcripcion e inmediatamente realizandola, moviendose
+a lo largo del gen dejando disponible el promotor para la union de otra
+polimerasa nueva. la polimerasa "desaparece" del sitema mientras se
+encuentra ocupada realizando la transcripcion de un gen por un tiempo
+"trg" que depende de la longitud del mensajero sintetizado. este modelo
+demuestra que el numero de mensajeros producidos depende de la disponibilidad
+del promotor para iniciar la transcripcion y del numero de polimerasas disponibles
+asi mismo muestra que pueden encontrarse varias polimerasas asociadas a un mismo
+gen al mismo tiempo. *)

@@ -1,0 +1,39 @@
+
+directive sample 1000.0 1000
+directive plot  Promotor() ; Mensajero(); RNApol() ; In()
+
+new bloquear@10.0: chan
+new transcripcion@10.0: chan 
+val sintmens = 0.1
+val libprom = 1.0
+val degradacion = 0.05
+val retraso = 0.01
+val bloqueo= 0.01
+
+let Promotor() = do ?transcripcion ; delay@libprom ; Promotor() 
+or ?bloquear ; delay@bloqueo ; ( Promotor() | In() )
+and In() = !bloquear
+
+let RNApol() = !transcripcion ; delay@sintmens ; (RNApol() | Mensajero())
+and Mensajero() =  delay@degradacion
+
+
+let Inhibidor() = delay@retraso ; delay@retraso ; delay@retraso ; (5 of In())
+
+
+run (2 of Promotor() | 10 of RNApol() | Inhibidor() )
+
+(*aquí se añade un inhibidor del promotor que se une con una tasa igual a
+la tasa del canal "bloquear" y permanece unido manteniendo secuestrado al
+promotor durante un tiempo igual al valor "bloqueo". el inhibidor es añadido
+a la simulación despues de un tiempo determinado por una serie de retrazos con
+duración "retraso" (3 consecutivos en este caso) *)
+(* se puede jugar con la afinidad del inhibidor dando mas o menos tiempo de
+exposición a la polimerasa y con el tiempo que dura el bloqueo manteniendo 
+periodos mas cortos o largos de expresión suspendida donde no hay un
+promotor disponible para transcribir.*)
+
+
+
+
+

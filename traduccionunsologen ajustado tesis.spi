@@ -1,0 +1,21 @@
+directive sample 100.0 1000
+directive plot Mensajero() ; Ribosoma() ; Proteina()
+
+new union@10.0:chan
+val libsur=1.0
+val traduccion=0.1
+val degradacion=0.05
+
+
+let Ribosoma()= !union
+
+let Mensajero() =  ?union ; delay@libsur ; (Mensajero() | RibosomaUnido() )
+and RibosomaUnido() = delay@traduccion ; ( Ribosoma() | Proteina() )
+and Proteina() = delay@degradacion
+
+
+
+ 
+
+
+run ( 100 of Ribosoma() | Mensajero() )

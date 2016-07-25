@@ -1,0 +1,23 @@
+directive sample 10000.0 1000
+directive plot  Promotor() 
+
+
+new union@10.0: chan
+ val liberar = 0.001
+ val disociar=0.01
+new activar@1.0:chan 
+ 
+
+let Promotor() = ?union
+
+let Represor() = do !union ; RepresorUnido() or ?activar ; RepresorInactivo()
+
+
+and RepresorUnido() = do  delay@liberar ; (Promotor() | Represor() ) or ?activar ; (Promotor() | RepresorInactivo() )
+
+and RepresorInactivo() = delay@disociar ; (Represor() | Activador() )
+
+and Activador() = !activar
+
+
+run (10 of Represor() | 1 of Promotor() | 100 of Activador())

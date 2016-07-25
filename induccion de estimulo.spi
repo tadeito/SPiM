@@ -1,0 +1,14 @@
+directive sample 100.0 
+directive plot x() ; estimulo()
+
+val c = 0.1 (*degradacion de x*)
+val e = 1.0 (*intercambio de estimulo por x*)
+
+let x() = delay@c (*x se degrada despues de un tiempo determinado*)
+
+let estimulo() = delay@e ; 10 of x() (*estimulo se convierte en varias copias de x despues de un tiempo*)
+
+
+
+run 100 of estimulo() (*1000,5000,10000*)
+(*en este caso, se corre el modelo con cien copias de estímulo que poco a poco se iran convirtiendo en x*)

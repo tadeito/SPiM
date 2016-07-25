@@ -1,0 +1,39 @@
+directive sample 10000.0 1000
+directive plot Mensajero() ; Ribosoma() ; Peptido1() ; Peptido2() ; Peptido3()
+
+new union@100.0:chan
+
+val afinidad1=1.0 (*que tan rapido se lbera el sitio de union al ribosoma*)
+val traduccion1=0.1 (*que tan rapido se produce el peptido y se libera el ribosoma*)
+val degradacion1=0.01 (*que tan rapido se degrada el peptido producido*)
+
+(*esto se repite por cada gen a traducir*)
+
+val afinidad2=1.0
+val traduccion2=0.05
+val degradacion2=0.01
+
+val afinidad3=1.0
+val traduccion3=0.02
+val degradacion3=0.01
+
+
+let Ribosoma()= !union
+
+let Mensajero1() =  ?union ; delay@afinidad1 ; (Mensajero1() | RibosomaUnido1() )
+and RibosomaUnido1() = delay@traduccion1 ; ( Ribosoma() | Peptido1() )
+and Peptido1() = delay@degradacion1
+
+let Mensajero2() =  ?union ; delay@afinidad2 ; (Mensajero2() | RibosomaUnido2() )
+and RibosomaUnido2() = delay@traduccion2 ; ( Ribosoma() | Peptido2() )
+and Peptido2() = delay@degradacion2
+
+let Mensajero3() =  ?union ; delay@afinidad3 ; (Mensajero3() | RibosomaUnido3() )
+and RibosomaUnido3() = delay@traduccion3 ; ( Ribosoma() | Peptido3() )
+and Peptido3() = delay@degradacion3
+
+
+ 
+
+
+run ( 300 of Ribosoma() | Mensajero1() | Mensajero2() | Mensajero3() )

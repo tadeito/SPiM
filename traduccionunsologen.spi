@@ -1,0 +1,21 @@
+directive sample 10000.0 1000
+directive plot Mensajero() ; Ribosoma() ; Peptido()
+
+new union@100.0:chan
+val afinidad=0.1
+val traduccion=1.0
+val degradacion=0.01
+
+
+let Ribosoma()= !union
+
+let Mensajero() =  ?union ; delay@afinidad ; (Mensajero() | RibosomaUnido() )
+and RibosomaUnido() = delay@traduccion ; ( Ribosoma() | Peptido() )
+and Peptido() = delay@degradacion
+
+
+
+ 
+
+
+run ( 10 of Ribosoma() | Mensajero() )

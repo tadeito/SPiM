@@ -1,0 +1,16 @@
+(* H + Cl <==> HCl *)
+directive sample 10000.0 1000
+directive plot Represor() ; Promotor()
+
+
+new union@10.0:chan(chan)
+
+let Represor() = (
+  new liberar@0.001: chan()
+  !union(liberar); Represor_unido(liberar))
+and Represor_unido(liberar:chan) = !liberar; Represor() 
+
+let Promotor() = ?union(liberar); Promotor_unido(liberar)
+and Promotor_unido(liberar:chan) = ?liberar; Promotor()
+
+run (10 of Represor() | 1 of Promotor())

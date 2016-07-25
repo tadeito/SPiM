@@ -1,0 +1,58 @@
+directive sample 50000.0 1000
+directive plot  Ribosoma() ; Proteina1() ; Proteina2() ; Proteina3() ; RNApol()
+
+new union@1.0:chan
+new traduccion@1.0:chan
+
+(*valores para la represion del operon*)
+
+val tbloqueo=0.00001
+new bloqueo@1.0:chan
+
+(*valores para la transcripcion*)
+val afinidad1=1.0 (*que tan rapido se lbera el promotor*)
+val vtranscripcion1=1.0 (*que tan rapido se produce el mensajero y se libera la RNA polimerasa*)
+val degradacion1=0.1 (*que tan rapido se degrada el mensajero*)
+val degradacion2=0.01
+val degradacion3=0.002
+
+(*valores para la traduccion*)
+val sur1=1.0 (*liberacion del sitio de union al ribosoma*)
+val vtraduccion1=0.1 (*tiempo que tarda en traducirse el mensajero*)
+val degprot1=0.01 (*tiempo de degradacion de la proteína*)
+
+val sur2=1.0 
+val vtraduccion2=0.1 
+val degprot2=0.01 
+
+val sur3=1.0 
+val vtraduccion3=0.1 
+val degprot3=0.01
+
+let Ribosoma() = !traduccion
+
+let RNApol()= !union
+
+let Represor() = !bloqueo ; delay@tbloqueo ; ( Represor() | Gen1() ) 
+
+and Gen1() = do  ?union ; delay@afinidad1 ; (Gen1() | RNApolUnida1() ) or ?bloqueo
+and RNApolUnida1() = delay@vtranscripcion1 ; ( RNApol() | Mensajero1()| Mensajero2() | Mensajero3() )
+and Mensajero1() = do ?traduccion; delay@sur1 ; ( Mensajero1() | RibosomaUnido1()) 
+or  delay@degradacion1
+
+and RibosomaUnido1() = delay@vtraduccion1 ; (Ribosoma() | Proteina1() )
+and Proteina1() = delay@degprot1
+and Mensajero2() = do ?traduccion; delay@sur2 ; ( Mensajero2() | RibosomaUnido2()) 
+or  delay@degradacion2
+and RibosomaUnido2() = delay@vtraduccion2 ; (Ribosoma() | Proteina2() )
+and Proteina2() = delay@degprot2
+and Mensajero3() = do ?traduccion; delay@sur3 ; ( Mensajero3() | RibosomaUnido3()) 
+or  delay@degradacion3
+and RibosomaUnido3() = delay@vtraduccion3 ; (Ribosoma() | Proteina3() )
+and Proteina3() = delay@degprot3
+
+
+
+
+
+run ( 300 of RNApol() | 100 of Ribosoma() | Gen1() | 10 of Represor()  )

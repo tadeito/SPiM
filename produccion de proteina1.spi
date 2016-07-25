@@ -1,0 +1,15 @@
+directive sample 100.0 100
+directive plot proteina()
+
+new transcripcion @ 100.0:chan
+val degradacion = 1.0
+
+let proteina() = delay@degradacion
+
+let gen() = ?transcripcion ; (gen() | proteina())
+
+let polimerasa()= !transcripcion; polimerasa()
+
+
+
+ run (proteina() | 1 of gen() | 1 of polimerasa())

@@ -1,0 +1,38 @@
+
+directive sample 100.0 1000
+directive plot  Promotor() ; Mensajero(); RNApol()
+
+new transcripcion@10.0: chan 
+val sintmens = 0.1
+val libprom = 1.0
+val degradacion = 0.05
+
+
+let Promotor() = ?transcripcion ; delay@libprom ; Promotor()
+let RNApol() = !transcripcion ; delay@sintmens ; (RNApol() | Mensajero())
+and Mensajero() =  delay@degradacion
+
+
+
+run ( Promotor() | 100 of RNApol())
+
+(* al utilizar los retrasos, se puede representar 
+el efecto de que un elemento esté "ocupado" en una 
+interacción y por lo tanto no disponible para hacer
+otras cosas*)
+
+(*En este modelo se ve claramente como el único
+promotor al interactuar con una RNA polimerasa
+deja de estar disponible hasta que esta "sale"
+y es cuando otra mas puede comenzar. tambien se
+observa como la RNA polimerasa tiene un retraso
+durante la transcripcion del gen y no esta 
+disponible hasta haber terminado.*)
+
+(*debido a que el promotor se encuentra ocupado
+una cierta cantidad de tiempo, puede saturarse
+y esto limita el numero de copias de mensajero 
+que se pueden producir por unidad de tiempo,
+independientemente de que se añadan mas 
+polimerasas*)
+

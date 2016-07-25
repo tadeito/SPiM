@@ -1,0 +1,12 @@
+directive sample 10000.0 1000
+directive plot Represor() ; Promotor()
+
+
+new union@10.0: chan
+ val liberar = 0.001
+
+let Promotor() = ?union ; delay@liberar ; ( Promotor() | Represor() )
+and Represor() = !union
+
+
+run (10 of Represor() | 1 of Promotor())

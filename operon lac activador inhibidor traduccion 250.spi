@@ -1,0 +1,47 @@
+
+directive sample 100000.0 1000
+directive plot  Promotor() ; Mensajero(); RNApol() ; Ac() ;  Permeasa() ; Betagal()
+
+new bloquear@10.0: chan
+new transcripcion@10.0: chan 
+new activar@1.0: chan
+new traducir@0.10: chan
+val sintmens = 0.1
+val libprom = 1.0
+val degradacion = 1.0
+val retraso = 0.01
+val bloqueo= 0.00010 
+val desbloq = 0.001
+val protdeg = 0.1
+val traduccion = 0.1
+
+let Promotor() = do ?transcripcion ; delay@libprom ; Promotor() 
+or ?bloquear ; delay@bloqueo ; ( Promotor() | In() )
+and In() = do !bloquear or ?activar
+
+let Ribosoma() = !traducir
+let Permeasa() = delay@protdeg
+let Betagal() = delay@protdeg
+
+let Mensajero() =  do ?traducir ; delay@traduccion ; ( Mensajero() | Ribosoma() | Permeasa() | Betagal() )
+or delay@degradacion
+
+
+
+
+let RNApol() = !transcripcion ; delay@sintmens ; (RNApol() | Mensajero())
+
+let Ac() = !activar ; delay@desbloq ; ( In() | Ac() )
+let Activador() = delay@retraso ; delay@retraso ; delay@retraso ; (100 of Ac())
+
+
+run ( Promotor() | 50 of RNApol() | 5 of In() | 500 of Ribosoma() | Activador() )
+
+
+
+
+
+
+
+
+

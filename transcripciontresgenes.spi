@@ -1,0 +1,37 @@
+directive sample 1000.0 1000
+directive plot  RNApol() ; Mensajero1() ; Mensajero2() ; Mensajero3()
+
+new union@1.0:chan
+
+val afinidad1=1.0 (*que tan rapido se lbera el promotor*)
+val vtranscripcion1=1.0 (*que tan rapido se produce el mensajero y se libera la RNA polimerasa*)
+val degradacion1=0.01 (*que tan rapido se degrada el mensajero*)
+
+(*esto se repite por cada gen a transcribir*)
+
+val afinidad2=1.0
+val vtranscripcion2=0.1
+val degradacion2=0.01
+
+val afinidad3=1.0
+val vtranscripcion3=0.1
+val degradacion3=0.01
+
+
+let RNApol()= !union
+
+let Gen1() =  ?union ; delay@afinidad1 ; (Gen1() | RNApolUnida1() )
+and RNApolUnida1() = delay@vtranscripcion1 ; ( RNApol() | Mensajero1() )
+and Mensajero1() = delay@degradacion1
+
+let Gen2() =  ?union ; delay@afinidad2 ; (Gen2() | RNApolUnida2() )
+and RNApolUnida2() = delay@vtranscripcion2 ; ( RNApol() | Mensajero2() )
+and Mensajero2() = delay@degradacion2
+
+let Gen3() =  ?union ; delay@afinidad3 ; (Gen3() | RNApolUnida3() )
+and RNApolUnida3() = delay@vtranscripcion3 ; ( RNApol() | Mensajero3() )
+and Mensajero3() = delay@degradacion3
+
+
+
+run ( 300 of RNApol() | Gen1() | Gen2() | Gen3() )

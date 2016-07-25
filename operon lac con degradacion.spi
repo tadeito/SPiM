@@ -1,0 +1,43 @@
+(*instrucciones para la salida de datos del simulador*)
+directive sample 20.0 1000
+directive plot Mensajero() ; Promotor() ; Alolac() ; Permeasa() ; Betagal() 
+
+(*damos la definicion de los canales de comunicacion y otros parámetros del modelo*)
+val sepesp = 5.0
+val degradar=10.0
+val degradar2=100.0
+val degradar3= 5.0
+val disociar=100.0
+new transcripcion@10.0 :chan
+(*se especifica el nombre, la frecuencia esperada por unidad de tiempo y el tipo de elemento*)
+new traduccion@1.0 :chan (*traduccion de los genes*)
+new transporte@10.0 :chan (*transporte de lactosa al interior de la celula*)
+new romper@10.0 :chan (*Ruptura de la lactosa *)
+new transg@0.10 :chan (* conversión de lactosa an alolactosa*)
+new bloq@10.0 :chan (*bloqueo del operador*)
+new desbloq@0.01 :chan (*desbloqueo del operador*)
+
+
+(*damos la definicion de cada uno de los procesos*)
+
+
+let Promotor()= do  ?transcripcion ; (Mensajero() | Promotor()) or ?bloq ; Represorunido()
+and Mensajero() = ?traduccion ; ( 5 of Permeasa() |10 of Betagal())
+and Represorunido() = do ?desbloq ; (Represorinac() | Promotor() ) or delay@sepesp ; ( Represorinac() | Promotor() )
+and Permeasa() = do !transporte ; Permeasa() or delay@degradar2
+and Betagal() = do !romper ; Betagal() or !transg ; Betagal() or delay@degradar2
+and Represorinac() = delay@disociar; ( Represor() | Alolac() )
+and Represor() =  !bloq
+and Alolac() = do !desbloq ; () or delay@degradar3
+and RNApol() =  !transcripcion ; RNApol()
+and Ribosoma() =  !traduccion ; Ribosoma()
+
+ 
+let Lactosaex() = ?transporte ; Lactosaint()
+and Lactosaint() = do ?romper ; ( Glucosa() | Galactosa()) 
+or ?transg ; Alolac()
+and Glucosa() = delay@degradar
+and Galactosa() = delay@degradar
+
+
+run ( 30 of Ribosoma()  |100 of RNApol()  | 10 of Betagal() | Represorunido() | 10 of Represor()  )

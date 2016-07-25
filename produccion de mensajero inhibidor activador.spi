@@ -1,0 +1,40 @@
+
+directive sample 1000.0 1000
+directive plot  Promotor() ; Mensajero(); RNApol() ; In()
+
+new bloquear@10.0: chan
+new transcripcion@10.0: chan 
+new activar@1.0: chan
+val sintmens = 0.1
+val libprom = 1.0
+val degradacion = 0.05
+val retraso = 0.01
+val bloqueo= 0.01
+val desbloq = 0.01
+
+let Promotor() = do ?transcripcion ; delay@libprom ; Promotor() 
+or ?bloquear ; delay@bloqueo ; ( Promotor() | In() )
+and In() = do !bloquear or ?activar
+
+let Mensajero() =  delay@degradacion
+
+let RNApol() = !transcripcion ; delay@sintmens ; (RNApol() | Mensajero())
+
+let Ac() = !activar ; delay@desbloq ; ( In() | Ac() )
+let Activador() = delay@retraso ; delay@retraso ; delay@retraso ; (50 of Ac())
+
+
+run ( Promotor() | 10 of RNApol() | 5 of In()| Activador()  )
+
+(* se extendió el modelo anterior con la adición de un activador que puede
+secuestrar al inhibidor por un periodo de tiempo determinado por "desbloq"
+y se añade a la simulación en varias copias despues de una serie de retrasos
+se observa claramente como el activador permite la liberación de Promotor
+y permite que RNApol se una y produzca Mensajero.*)
+
+
+
+
+
+
+
